@@ -1,0 +1,29 @@
+name: Build CI
+on:
+  push:
+    branches:
+      - staging
+jobs:
+  build:
+    name: Test on iOS simulator
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Java setup
+        uses: actions/setup-java@v4.0.0
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+      - name: Flutter setup
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: 'stable'
+      - name: Create iOS simulator
+        uses: futureware-tech/simulator-action@v3
+        with:
+          model: 'iPhone 14'
+      - run: flutter pub get
+      - run: flutter pub run build_runner build --delete-conflicting-outputs
+      - run: flutter test --flavor=dev
+      - run: flutter test integration_test --flavor=dev
